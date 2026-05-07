@@ -19,7 +19,6 @@ public class CategoryController : ControllerBase
     }
 
 
-
     /// <summary>
     /// Retrieves all categories without pagination.
     /// </summary>
@@ -32,12 +31,11 @@ public class CategoryController : ControllerBase
     /// <summary>
     /// Retrieves categories with optional search, filtering, sorting, and pagination.
     /// </summary>
-    [HttpGet]
+    [HttpGet("All-Paginated")]
     public async Task<Result<PagedResultDto<CategoryDto>>> GetAllPaginatedAsync(
         [FromQuery] PagedAndSortedAndSearchResultRequestDto pagination,
         [FromQuery] List<FilterRequestDto>? filters)
     {
-
         return await _categoryAppService.GetAllPaginatedAsync(pagination, filters);
     }
 
