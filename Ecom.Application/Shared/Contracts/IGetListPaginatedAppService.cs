@@ -19,5 +19,6 @@ public interface IGetListPaginatedAppService<TInput, TOutput> where TInput : Pag
     /// A task that represents the asynchronous operation,
     /// the task result contains the pagination output.
     /// </returns>
-    Task<TOutput> GetAllPaginatedAsync(TInput paginationRequest, List<FilterRequestDto>? filters);
+    //Task<TOutput> GetAllPaginatedAsync(TInput paginationRequest, List<FilterRequestDto>? filters);
+    Task<TOutput> GetAllPaginatedAsync(TInput paginationRequest);
 }
