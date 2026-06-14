@@ -34,11 +34,12 @@ public class CategoryController : ControllerBase
     /// </summary>
     [HttpGet]
     public async Task<Result<PagedResultDto<CategoryDto>>> GetAllPaginatedAsync(
-        [FromQuery] PagedAndSortedAndSearchResultRequestDto pagination,
-        [FromQuery] List<FilterRequestDto>? filters)
+        [FromQuery] PagedAndSortedAndSearchResultRequestDto pagination)
+        //,[FromQuery] List<FilterRequestDto>? filters)
     {
 
-        return await _categoryAppService.GetAllPaginatedAsync(pagination, filters);
+        return await _categoryAppService.GetAllPaginatedAsync(pagination);
+        //return await _categoryAppService.GetAllPaginatedAsync(pagination, filters);
     }
 
     /// <summary>

@@ -39,14 +39,14 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
     }
 
     public virtual async Task<Result<PagedResultDto<TDto>>> GetAllPaginatedAsync(
-        TPaginationRequest paginationRequest,
-        List<FilterRequestDto>? filters)
+        TPaginationRequest paginationRequest)
+        //,List<FilterRequestDto>? filters)
     {
         var query = _baseRepository.Table;
 
         (int totalCount, List<TEntity> entities) = await query
             .SearchBy(paginationRequest.SearchingTerm)
-            .FilterBy(filters)
+            //.FilterBy(filters)
             .OrderBy(paginationRequest.Sorting ?? "Id")
             .ToPagedResultAsync(paginationRequest);
 
