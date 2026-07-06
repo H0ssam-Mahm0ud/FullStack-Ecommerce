@@ -1,4 +1,5 @@
-﻿using Ecom.Domain.Entities.Product;
+﻿using Ecom.Application.Photos.Dtos;
+using Ecom.Domain.Entities.Product;
 
 namespace Ecom.Application.Products.Dtos;
 
