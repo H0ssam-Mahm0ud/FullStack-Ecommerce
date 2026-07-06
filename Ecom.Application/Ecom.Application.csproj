@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Photos\Contracts\" />
-    <Folder Include="Photos\Mappings\" />
     <Folder Include="Photos\Services\" />
   </ItemGroup>
 

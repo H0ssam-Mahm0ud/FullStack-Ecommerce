@@ -5,7 +5,7 @@ namespace Ecom.Domain.Entities.Product;
 
 public class Image : BaseEntity<Guid>
 {
-    public string ImageName { get; set; }
+    public string ImageUrl { get; set; }
 
 
     //foreign keys

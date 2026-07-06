@@ -12,6 +12,6 @@ public interface IProductAppService : ICrudAppService
     Guid,
     PagedAndSortedAndSearchResultRequestDto,
     Result<PagedResultDto<ProductDto>>>,
-    IGetListAppService<Result<List<CategoryDto>>>
+    IGetListAppService<Result<List<ProductDto>>>
 {
 }
