@@ -8,7 +8,7 @@ public class Product : AuditableEntity<Guid>
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
-    public virtual List<Image> Images { get; set; }
+    public virtual List<Image>? Images { get; set; }
 
     // foreign keys
     public Guid CategoryId { get; set; }

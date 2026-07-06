@@ -62,11 +62,7 @@ public static class ProductMapping
 
     public static Product UpdateEntity(this Product entity, CreateUpdateProductDto dto)
     {
-        entity.Name = dto.Name;
-        entity.Description = dto.Description;
-        entity.Price = dto.Price;
-        entity.Images = dto.Images?.Select(p => p.ToEntity()).ToList() ?? new List<Image>();
-        entity.CategoryId = dto.CategoryId;
+        dto.MapTo(entity);
         return entity;
     }
 }
