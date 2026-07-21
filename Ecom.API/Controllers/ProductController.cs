@@ -49,7 +49,7 @@ public class ProductController : ControllerBase
     /// Creates a new product.
     /// </summary>
     [HttpPost]
-    public async Task<Result<ProductDto>> CreateAsync([FromBody] CreateUpdateProductDto input)
+    public async Task<Result<ProductDto>> CreateAsync([FromForm] CreateUpdateProductDto input)
     {
         return await _productAppService.CreateAsync(input);
     }

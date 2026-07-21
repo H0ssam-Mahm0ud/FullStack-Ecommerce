@@ -1,8 +1,10 @@
 ﻿using Ecom.Domain.Entities.Product;
+using Microsoft.AspNetCore.Http;
 
 namespace Ecom.Application.Photos.Dtos;
 
 public class CreateUpdateImageDto
 {
-    public string ImageUrl { get; set; }
+    public IFormFile? ImageFile { get; set; }
+    public string? ImageUrl { get; set; }
 }

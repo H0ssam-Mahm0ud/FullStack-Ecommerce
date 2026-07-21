@@ -31,7 +31,7 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
 
 
     #region CRUD Methods
-    public async Task<Result<List<TDto>>> GetAllAsync()
+    public virtual async Task<Result<List<TDto>>> GetAllAsync()
     {
         var entities = await _baseRepository.GetAllAsync();
         var dtos = entities.Select(ToDto).ToList();
@@ -58,7 +58,7 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
     }
 
 
-    public async Task<Result<TDto>> GetByIdAsync(TId id)
+    public virtual async Task<Result<TDto>> GetByIdAsync(TId id)
     {
         var entity = await _baseRepository.GetByIdAsync(id);
         if (entity == null)
@@ -69,7 +69,7 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
     }
 
 
-    public async Task<Result<TDto>> CreateAsync(TInput input)
+    public virtual async Task<Result<TDto>> CreateAsync(TInput input)
     {
         var entity = ToEntity(input);
         bool success = await _baseRepository.InsertAsync(entity);
@@ -80,7 +80,7 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
         return Result<TDto>.Success(ToDto(entity));
     }
 
-    public async Task<Result<TDto>> UpdateAsync(TInput input, TId id)
+    public virtual async Task<Result<TDto>> UpdateAsync(TInput input, TId id)
     {
         var existing = await _baseRepository.GetByIdAsync(id);
         if (existing == null)
@@ -98,7 +98,7 @@ public abstract class CrudAppService<TEntity, TInput, TDto, TId, TPaginationRequ
         return Result<TDto>.Success(ToDto(existing));
     }
 
-    public async Task<Result<TDto>> DeleteAsync(TId id)
+    public virtual async Task<Result<TDto>> DeleteAsync(TId id)
     {
         var entity = await _baseRepository.GetByIdAsync(id);
         if (entity == null)

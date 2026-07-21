@@ -1,5 +1,6 @@
 using Ecom.Application.Registerations;
 using Ecom.Infrastructure.Registerations;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ecom.API;
 
@@ -21,6 +22,8 @@ public class Program
         builder.Services.RegisterDbContext(builder.Configuration);
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterServices(builder.Configuration);
+        builder.Services.AddScoped<IFileProvider>(sp =>
+            new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Uploads")));
 
         var app = builder.Build();
 
