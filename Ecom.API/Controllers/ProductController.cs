@@ -58,7 +58,7 @@ public class ProductController : ControllerBase
     /// Updates an existing product by its identifier.
     /// </summary>
     [HttpPut("{id:guid}")]
-    public async Task<Result<ProductDto>> UpdateAsync([FromBody] CreateUpdateProductDto input, Guid id)
+    public async Task<Result<ProductDto>> UpdateAsync([FromForm] CreateUpdateProductDto input, Guid id)
     {
         return await _productAppService.UpdateAsync(input, id);
     }

@@ -9,6 +9,7 @@ public static class CategoryMapping
     {
         return new CategoryDto
         {
+            Id = input.Id,
             Name = input.Name,
             Description = input.Description,
             //Products = input.Products.Select(e => e.ToDto()).ToList()

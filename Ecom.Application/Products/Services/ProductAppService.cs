@@ -33,7 +33,6 @@ public class ProductAppService : CrudAppService<
         => entity.ToDto();
 
     protected override Product ToEntity(CreateUpdateProductDto input)
-
         => input.ToEntity();
 
     protected override void UpdateEntity(CreateUpdateProductDto input, Product entity)
@@ -41,40 +40,48 @@ public class ProductAppService : CrudAppService<
 
     public override async Task<Result<ProductDto>> CreateAsync(CreateUpdateProductDto input)
     {
-        if (input.Images?.Any() == true)
+        var entity = ToEntity(input);
+
+        if (input.NewImages?.Any() == true)
         {
-            foreach (var image in input.Images)
+            foreach (var file in input.NewImages)
             {
-                if (image.ImageFile != null)
-                {
-                    image.ImageUrl = await _fileService.SaveFileAsync(image.ImageFile, RootFolders.Products);
-                }
+                var savedUrl = await _fileService.SaveFileAsync(file, RootFolders.Products);
+                entity.Images.Add(new Image { ImageUrl = savedUrl });
             }
         }
 
-        return await base.CreateAsync(input);
+        bool success = await _baseRepository.InsertAsync(entity);
+        if (!success) 
+            return Result<ProductDto>.Error("Failed to create product.");
+
+        return Result<ProductDto>.Success(ToDto(entity));
     }
 
     public override async Task<Result<ProductDto>> UpdateAsync(CreateUpdateProductDto input, Guid id)
     {
-        var existingProduct = await _productRepository.GetByIdAsync(id);
+        var existingProduct = await _baseRepository.GetByIdAsync(id);
+        if (existingProduct == null) return Result<ProductDto>.NotFound("Product not found");
 
-        if (existingProduct?.Images?.Any() == true && input.Images?.Any() == true)
+        if (existingProduct.Images?.Any() == true)
         {
-            foreach (var oldImage in existingProduct.Images)
+            var urlsToKeep = input.ExistingImageUrls ?? new List<string>();
+            var imagesToRemove = existingProduct.Images
+                .Where(old => !urlsToKeep.Contains(old.ImageUrl))
+                .ToList();
+
+            foreach (var oldImage in imagesToRemove)
             {
                 _fileService.DeleteFile(oldImage.ImageUrl);
             }
         }
 
-        if (input.Images?.Any() == true)
+        if (input.NewImages?.Any() == true)
         {
-            foreach (var image in input.Images)
+            foreach (var file in input.NewImages)
             {
-                if (image.ImageFile != null)
-                {
-                    image.ImageUrl = await _fileService.SaveFileAsync(image.ImageFile, RootFolders.Products);
-                }
+                var savedUrl = await _fileService.SaveFileAsync(file, RootFolders.Products);
+                existingProduct.Images.Add(new Image { ImageUrl = savedUrl });
             }
         }
 

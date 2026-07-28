@@ -23,7 +23,14 @@ public class Program
         builder.Services.RegisterRepositories(builder.Configuration);
         builder.Services.RegisterServices(builder.Configuration);
         builder.Services.AddScoped<IFileProvider>(sp =>
-            new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Uploads")));
+        {
+            var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Uploads");
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+            return new PhysicalFileProvider(uploadPath);
+        });
 
         var app = builder.Build();
 
@@ -34,6 +41,8 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseStaticFiles();
 
         app.UseHttpsRedirection();
 

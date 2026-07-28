@@ -28,7 +28,7 @@ public static class ProductMapping
             Description = input.Description,
             Price = input.Price,
             CategoryId = input.CategoryId,
-            Images = input.Images?.Select(p => p.ToEntity()).ToList() ?? new List<Image>()
+            Images = new List<Image>()
         };
     }
 
@@ -38,24 +38,18 @@ public static class ProductMapping
         entity.Description = dto.Description;
         entity.Price = dto.Price;
         entity.CategoryId = dto.CategoryId;
-        if (dto.Images != null)
+
+        if (entity.Images != null)
         {
-            var imagesToRemove = entity.Images.Where(p => !dto.Images.Any(d => d.ImageUrl == p.ImageUrl)).ToList();
+            var urlsToKeep = dto.ExistingImageUrls ?? new List<string>();
+
+            var imagesToRemove = entity.Images
+                .Where(p => !urlsToKeep.Contains(p.ImageUrl))
+                .ToList();
+
             foreach (var image in imagesToRemove)
             {
                 entity.Images.Remove(image);
-            }
-            foreach (var imageDto in dto.Images)
-            {
-                var existingImage = entity.Images.FirstOrDefault(p => p.ImageUrl == imageDto.ImageUrl);
-                if (existingImage == null)
-                {
-                    entity.Images.Add(imageDto.ToEntity());
-                }
-                else
-                {
-                    imageDto.MapTo(existingImage);
-                }
             }
         }
     }
