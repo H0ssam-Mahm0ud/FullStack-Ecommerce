@@ -1,5 +1,4 @@
-﻿using Ecom.Application.Categories.Dtos;
-using Ecom.Application.Products.Dtos;
+﻿using Ecom.Application.Products.Dtos;
 using Ecom.Application.Results;
 using Ecom.Application.Shared.Contracts;
 using Ecom.Domain.Pagination;
