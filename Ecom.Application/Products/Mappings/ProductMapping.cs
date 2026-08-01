@@ -14,9 +14,10 @@ public static class ProductMapping
             Id = input.Id,
             Name = input.Name,
             Description = input.Description,
-            Price = input.Price,
+            NewPrice = input.NewPrice,
+            OldPrice = input.OldPrice,
             CategoryId = input.CategoryId,
-            Images = input.Images?.Select(p => p.ToDto()).ToList() ?? new List<ImageDto>()
+            Images = input.Images?.Select(i => i.ToDto()).ToList() ?? new List<ImageDto>()
         };
     }
 
@@ -26,7 +27,8 @@ public static class ProductMapping
         {
             Name = input.Name,
             Description = input.Description,
-            Price = input.Price,
+            NewPrice = input.NewPrice,
+            OldPrice = input.OldPrice,
             CategoryId = input.CategoryId,
             Images = new List<Image>()
         };
@@ -36,22 +38,10 @@ public static class ProductMapping
     {
         entity.Name = dto.Name;
         entity.Description = dto.Description;
-        entity.Price = dto.Price;
+        entity.NewPrice = dto.NewPrice;
+        entity.OldPrice = dto.OldPrice;
         entity.CategoryId = dto.CategoryId;
-
-        if (entity.Images != null)
-        {
-            var urlsToKeep = dto.ExistingImageUrls ?? new List<string>();
-
-            var imagesToRemove = entity.Images
-                .Where(p => !urlsToKeep.Contains(p.ImageUrl))
-                .ToList();
-
-            foreach (var image in imagesToRemove)
-            {
-                entity.Images.Remove(image);
-            }
-        }
+        entity.Images = dto.ExistingImageUrls?.Select(url => new Image { ImageUrl = url }).ToList() ?? new List<Image>();
     }
 
     public static Product UpdateEntity(this Product entity, CreateUpdateProductDto dto)

@@ -13,44 +13,40 @@ public class FileService : IFileService
         _fileProvider = fileProvider;
     }
 
-    public async Task<string> SaveFileAsync(IFormFile file, string folderName)
+    public async Task<List<string>> SaveFileAsync(IFormFileCollection files, string src)
     {
-        if (file == null || file.Length == 0) return string.Empty;
+        var saveImageSrc = new List<string>();
+        var imageDirectory = Path.Combine("wwwroot", "Images", src);
 
-        var folderInfo = _fileProvider.GetFileInfo(folderName);
-        var physicalFolder = folderInfo.PhysicalPath;
-
-        if (string.IsNullOrEmpty(physicalFolder))
+        if(Directory.Exists(imageDirectory) is not true)
         {
-            throw new InvalidOperationException("The configured IFileProvider does not support physical paths.");
+            Directory.CreateDirectory(imageDirectory);
         }
 
-        if (!Directory.Exists(physicalFolder))
+        foreach(var item in files)
         {
-            Directory.CreateDirectory(physicalFolder);
+            if(item.Length > 0)
+            {
+                var imageName = item.FileName;
+                var imageSrc = $"/Images/{src}/{imageName}";
+                var root = Path.Combine(imageDirectory, imageName);
+
+                using (FileStream stream = new FileStream(root, FileMode.Create))
+                {
+                    await item.CopyToAsync(stream);
+                }
+
+                saveImageSrc.Add(imageSrc);
+            }
         }
 
-        var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-        var physicalFilePath = Path.Combine(physicalFolder, uniqueFileName);
-
-        using (var stream = new FileStream(physicalFilePath, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
-
-        return Path.Combine(folderName, uniqueFileName).Replace("\\", "/");
+        return saveImageSrc;
     }
 
-    public void DeleteFile(string filePath)
+    public void DeleteFile(string src)
     {
-        if (string.IsNullOrEmpty(filePath)) return;
-
-        var fileInfo = _fileProvider.GetFileInfo(filePath);
-        var physicalPath = fileInfo.PhysicalPath;
-
-        if (!string.IsNullOrEmpty(physicalPath) && File.Exists(physicalPath))
-        {
-            File.Delete(physicalPath);
-        }
+        var info = _fileProvider.GetFileInfo(src);
+        var root = info.PhysicalPath;
+        File.Delete(root);
     }
 }

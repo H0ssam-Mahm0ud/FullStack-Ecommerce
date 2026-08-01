@@ -24,11 +24,13 @@ public class Program
         builder.Services.RegisterServices(builder.Configuration);
         builder.Services.AddScoped<IFileProvider>(sp =>
         {
-            var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Uploads");
-            if (!Directory.Exists(uploadPath))
-            {
-                Directory.CreateDirectory(uploadPath);
-            }
+            var env = sp.GetRequiredService<IWebHostEnvironment>();
+            var webRoot = !string.IsNullOrEmpty(env.WebRootPath)
+                ? env.WebRootPath
+                : Path.Combine(env.ContentRootPath, "wwwroot");
+
+            var uploadPath = Path.Combine(webRoot, "Images");
+            Directory.CreateDirectory(uploadPath); // safe even if exists
             return new PhysicalFileProvider(uploadPath);
         });
 

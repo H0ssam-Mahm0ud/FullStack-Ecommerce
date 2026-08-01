@@ -21,13 +21,13 @@ public class ProductAppService : CrudAppService<
 {
     private readonly IFileService _fileService;
     private readonly IProductRepository _productRepository;
+
     public ProductAppService(IProductRepository productRepository, IFileService fileService)
         : base(productRepository)
     {
         _fileService = fileService;
         _productRepository = productRepository;
     }
-
 
     protected override ProductDto ToDto(Product entity)
         => entity.ToDto();
@@ -40,30 +40,35 @@ public class ProductAppService : CrudAppService<
 
     public override async Task<Result<ProductDto>> CreateAsync(CreateUpdateProductDto input)
     {
-        var entity = ToEntity(input);
+        var product = ToEntity(input);
+
+        product.Images ??= new List<Image>();
 
         if (input.NewImages?.Any() == true)
         {
-            foreach (var file in input.NewImages)
+            var savedUrls = await _fileService.SaveFileAsync(input.NewImages, RootFolders.Products);
+
+            foreach (var url in savedUrls)
             {
-                var savedUrl = await _fileService.SaveFileAsync(file, RootFolders.Products);
-                entity.Images.Add(new Image { ImageUrl = savedUrl });
+                product.Images.Add(new Image { ImageUrl = url });
             }
         }
 
-        bool success = await _baseRepository.InsertAsync(entity);
-        if (!success) 
-            return Result<ProductDto>.Error("Failed to create product.");
-
-        return Result<ProductDto>.Success(ToDto(entity));
+        await _productRepository.InsertAsync(product);
+        return Result<ProductDto>.Success(ToDto(product));
     }
 
     public override async Task<Result<ProductDto>> UpdateAsync(CreateUpdateProductDto input, Guid id)
     {
         var existingProduct = await _baseRepository.GetByIdAsync(id);
-        if (existingProduct == null) return Result<ProductDto>.NotFound("Product not found");
+        if (existingProduct == null)
+        {
+            return Result<ProductDto>.NotFound("Product not found");
+        }
 
-        if (existingProduct.Images?.Any() == true)
+        existingProduct.Images ??= new List<Image>();
+
+        if (existingProduct.Images.Any())
         {
             var urlsToKeep = input.ExistingImageUrls ?? new List<string>();
             var imagesToRemove = existingProduct.Images
@@ -73,15 +78,17 @@ public class ProductAppService : CrudAppService<
             foreach (var oldImage in imagesToRemove)
             {
                 _fileService.DeleteFile(oldImage.ImageUrl);
+                existingProduct.Images.Remove(oldImage); 
             }
         }
 
         if (input.NewImages?.Any() == true)
         {
-            foreach (var file in input.NewImages)
+            var savedUrls = await _fileService.SaveFileAsync(input.NewImages, RootFolders.Products);
+
+            foreach (var url in savedUrls)
             {
-                var savedUrl = await _fileService.SaveFileAsync(file, RootFolders.Products);
-                existingProduct.Images.Add(new Image { ImageUrl = savedUrl });
+                existingProduct.Images.Add(new Image { ImageUrl = url });
             }
         }
 

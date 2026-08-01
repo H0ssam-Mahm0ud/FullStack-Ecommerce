@@ -7,8 +7,9 @@ public class CreateUpdateProductDto
 {
     public string Name { get; set; }
     public string Description { get; set; }
-    public decimal Price { get; set; }
+    public decimal OldPrice { get; set; }
+    public decimal NewPrice { get; set; }
     public Guid CategoryId { get; set; }
-    public List<IFormFile>? NewImages { get; set; }
+    public IFormFileCollection? NewImages { get; set; }
     public List<string>? ExistingImageUrls { get; set; }
 }
