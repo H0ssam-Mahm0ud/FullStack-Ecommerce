@@ -41,7 +41,6 @@ public static class ProductMapping
         entity.NewPrice = dto.NewPrice;
         entity.OldPrice = dto.OldPrice;
         entity.CategoryId = dto.CategoryId;
-        entity.Images = dto.ExistingImageUrls?.Select(url => new Image { ImageUrl = url }).ToList() ?? new List<Image>();
     }
 
     public static Product UpdateEntity(this Product entity, CreateUpdateProductDto dto)
