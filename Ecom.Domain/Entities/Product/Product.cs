@@ -9,10 +9,10 @@ public class Product : AuditableEntity<Guid>
     public string Description { get; set; }
     public decimal OldPrice { get; set; }
     public decimal NewPrice { get; set; }
-    public virtual List<Image>? Images { get; set; }
+    public List<Image>? Images { get; set; }
 
     // foreign keys
     public Guid CategoryId { get; set; }
     [ForeignKey("CategoryId")]
-    public virtual Category Category { get; set; }
+    public Category Category { get; set; }
 }

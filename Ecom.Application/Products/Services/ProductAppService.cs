@@ -3,11 +3,13 @@ using Ecom.Application.Products.Dtos;
 using Ecom.Application.Products.Mappings;
 using Ecom.Application.Results;
 using Ecom.Application.Shared.Contracts;
+using Ecom.Application.Shared.Extensions;
 using Ecom.Application.Shared.Services;
 using Ecom.Domain.Constants;
 using Ecom.Domain.Contracts;
 using Ecom.Domain.Entities.Product;
 using Ecom.Domain.Pagination;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Application.Products.Services;
 
@@ -37,6 +39,50 @@ public class ProductAppService : CrudAppService<
 
     protected override void UpdateEntity(CreateUpdateProductDto input, Product entity)
         => entity.UpdateEntity(input);
+
+    public override async Task<Result<List<ProductDto>>> GetAllAsync()
+    {
+        var entities = await _productRepository.Table
+            .Include(p => p.Images)
+            .ToListAsync();
+
+        var dtos = entities.Select(ToDto).ToList();
+
+        return Result<List<ProductDto>>.Success(dtos);
+    }
+
+    public override async Task<Result<PagedResultDto<ProductDto>>> GetAllPaginatedAsync(
+        PagedAndSortedAndSearchResultRequestDto paginationRequest)
+    {
+        var query = _productRepository.Table
+            .Include(p => p.Images);
+        (int totalCount, List<Product> entities) = await query
+            .SearchBy(paginationRequest.SearchingTerm)
+            .OrderBy(paginationRequest.Sorting ?? "Id")
+            .ToPagedResultAsync(paginationRequest);
+
+        var dtos = entities.Select(ToDto).ToList();
+
+        return Result<PagedResultDto<ProductDto>>.Success(new PagedResultDto<ProductDto>
+        {
+            TotalCount = totalCount,
+            Items = dtos
+        });
+    }
+
+    public override async Task<Result<ProductDto>> GetByIdAsync(Guid id)
+    {
+        var entity = await _productRepository.Table
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (entity == null)
+        {
+            return Result<ProductDto>.NotFound("Product not found");
+        }
+
+        return Result<ProductDto>.Success(ToDto(entity));
+    }
 
     public override async Task<Result<ProductDto>> CreateAsync(CreateUpdateProductDto input)
     {

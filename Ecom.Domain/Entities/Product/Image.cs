@@ -11,5 +11,5 @@ public class Image : BaseEntity<Guid>
     //foreign keys
     public Guid ProductId { get; set; }
     [ForeignKey("ProductId")]
-    public virtual Product Product { get; set; }
+    public Product Product { get; set; }
 }
